@@ -1,16 +1,38 @@
 import React from "react";
+import PropTypes from "prop-types";
+import { Route, Redirect, Switch, withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import Home from "./Home/Home";
+import BoardContainer from "./Board/BoardContainer";
+import LandingPage from "./LandingPage/LandingPage";
 import "./App.scss";
 
-function App() {
+function App({ user, isGuest }) {
+  if (user || isGuest) {
+    return (
+      <div className="App">
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/b/:boardId" component={BoardContainer} />
+          <Redirect to="/" />
+        </Switch>
+      </div>
+    );
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-      </header>
-    </div>
+    <Switch>
+      <Route exact path="/" component={LandingPage} />
+      <Redirect to="/" />
+    </Switch>
   );
 }
 
-export default App;
+App.propTypes = { user: PropTypes.object, isGuest: PropTypes.bool.isRequired };
+
+const mapStateToProps = (state) => ({
+  user: state.user,
+  isGuest: state.isGuest,
+});
+
+export default withRouter(connect(mapStateToProps)(App));
